@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en" data-contrast="normal" data-hover="off" data-size="md">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Karigari — Local Hands, Global Reach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#E8E1CF;
+    --card:#F4EFE2;
+    --ink:#262220;
+    --ink-soft:#5B5348;
+    --indigo:#2E4057;
+    --indigo-dark:#1F2D3D;
+    --madder:#A8402F;
+    --turmeric:#C9962C;
+    --thread:#C9BFA4;
+    --thread-line:#B9AE93;
+    --focus:#1F2D3D;
+    --radius:4px;
+    --shadow:0 2px 0 rgba(38,34,32,0.12);
+    --font-display:'Fraunces', serif;
+    --font-body:'Work Sans', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+  }
+  html[data-size="sm"]{ font-size:15px; }
+  html[data-size="md"]{ font-size:17px; }
+  html[data-size="lg"]{ font-size:20px; }
+  html[data-size="xl"]{ font-size:24px; }
+
+  html[data-contrast="high"]{
+    --paper:#000000;
+    --card:#0A0A0A;
+    --ink:#FFFFFF;
+    --ink-soft:#F4E24A;
+    --indigo:#FFD400;
+    --indigo-dark:#FFD400;
+    --madder:#FF5A3C;
+    --turmeric:#FFD400;
+    --thread:#FFFFFF;
+    --thread-line:#FFFFFF;
+    --focus:#FFD400;
+    --shadow:none;
+  }
+
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--paper); color:var(--ink); font-family:var(--font-body); transition:background .2s, color .2s; }
+  h1,h2,h3{ font-family:var(--font-display); margin:0; letter-spacing:-0.01em; }
+  p{ margin:0; }
+  button, input, select, textarea{ font-family:inherit; font-size:1rem; color:inherit; }
+  button{ cursor:pointer; }
+  a{ color:var(--indigo); }
+  :focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+
+  html[data-hover="on"] button:hover, html[data-hover="on"] a:hover, html[data-hover="on"] .card:hover, html[data-hover="on"] .icon-btn:hover, html[data-hover="on"] select:hover, html[data-hover="on"] .toggle-row:hover{
+    outline:3px solid var(--turmeric); outline-offset:2px; background:rgba(201,150,44,0.15) !important;
+  }
+
+  .app{ min-height:100vh; display:flex; flex-direction:column; }
+  .hidden{ display:none !important; }
+
+  /* ---------- Stamp mark (signature element) ---------- */
+  .stamp{ display:inline-block; }
+  .stamp svg{ display:block; }
+  .stamp-press{ animation: press 900ms ease; }
+  @keyframes press{
+    0%{ transform:scale(1.6) rotate(-8deg); opacity:0; }
+    40%{ transform:scale(0.94) rotate(2deg); opacity:1; }
+    60%{ transform:scale(1.05) rotate(-1deg); }
+    100%{ transform:scale(1) rotate(0deg); }
+  }
+
+  /* ---------- Landing ---------- */
+  .landing{ flex:1; display:flex; flex-direction:column; }
+  .landing-top{ display:flex; align-items:center; gap:0.6rem; padding:1.4rem 1.6rem; }
+  .brand{ display:flex; align-items:center; gap:0.6rem; }
+  .brand-name{ font-family:var(--font-display); font-weight:700; font-size:1.3rem; }
+  .landing-main{ flex:1; display:flex; align-items:center; justify-content:center; padding:2rem 1.6rem 3rem; }
+  .thesis-wrap{ max-width:640px; text-align:left; }
+  .eyebrow{ font-family:var(--font-mono); text-transform:uppercase; letter-spacing:0.12em; font-size:0.75rem; color:var(--madder); margin-bottom:0.9rem; display:block; }
+  .thesis{ font-size:clamp(1.8rem, 5vw, 2.8rem); line-height:1.15; font-weight:600; }
+  .thesis em{ font-style:italic; color:var(--indigo); }
+  .thesis-sub{ margin-top:1.1rem; color:var(--ink-soft); font-size:1.05rem; line-height:1.5; max-width:52ch; }
+  .cta-row{ margin-top:2rem; display:flex; gap:0.8rem; flex-wrap:wrap; }
+
+  .btn{ border:2px solid var(--ink); border-radius:var(--radius); padding:0.75rem 1.4rem; font-weight:600; background:transparent; box-shadow:var(--shadow); }
+  .btn-primary{ background:var(--indigo); color:#fff; border-color:var(--indigo-dark); }
+  html[data-contrast="high"] .btn-primary{ color:#000; }
+  .btn-primary:active{ transform:translateY(1px); }
+  .btn-ghost{ background:transparent; }
+  .btn-lg{ padding:0.95rem 1.8rem; font-size:1.05rem; }
+  .btn-stamp{ display:inline-flex; align-items:center; gap:0.6rem; }
+
+  /* ---------- Forms ---------- */
+  .form-screen{ flex:1; display:flex; align-items:center; justify-content:center; padding:2rem 1.2rem; }
+  .form-card{ width:100%; max-width:440px; background:var(--card); border:2px solid var(--ink); border-radius:6px; padding:2rem; box-shadow:var(--shadow); }
+  .form-card h2{ font-size:1.6rem; margin-bottom:0.3rem; }
+  .form-card .form-sub{ color:var(--ink-soft); font-size:0.92rem; margin-bottom:1.4rem; }
+  .field{ margin-bottom:1.1rem; }
+  .field label{ display:block; font-family:var(--font-mono); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.35rem; color:var(--ink-soft); }
+  .field input, .field select{ width:100%; padding:0.65rem 0.7rem; border:2px solid var(--thread-line); border-radius:var(--radius); background:var(--paper); color:var(--ink); }
+  .field .hint{ font-size:0.78rem; color:var(--ink-soft); margin-top:0.3rem; }
+  .form-actions{ margin-top:1.4rem; display:flex; flex-direction:column; gap:0.7rem; }
+  .switch-line{ text-align:center; font-size:0.9rem; color:var(--ink-soft); }
+  .form-error{ background:rgba(168,64,47,0.12); border:1px solid var(--madder); color:var(--madder); padding:0.6rem 0.8rem; border-radius:var(--radius); font-size:0.88rem; margin-bottom:1rem; }
+  html[data-contrast="high"] .form-error{ color:var(--ink); }
+
+  /* ---------- App shell ---------- */
+  .topbar{ display:flex; align-items:center; justify-content:space-between; padding:1rem 1.6rem; border-bottom:2px solid var(--ink); }
+  .top-right{ display:flex; align-items:center; gap:0.7rem; position:relative; }
+  .icon-btn{ width:2.6rem; height:2.6rem; border-radius:50%; border:2px solid var(--ink); background:var(--card); display:flex; align-items:center; justify-content:center; }
+  .icon-btn svg{ width:1.3rem; height:1.3rem; }
+
+  .panel{ position:absolute; top:3.2rem; right:0; width:280px; background:var(--card); border:2px solid var(--ink); border-radius:6px; box-shadow:0 6px 0 rgba(38,34,32,0.14); padding:1rem; z-index:30; }
+  .panel h3{ font-size:0.78rem; font-family:var(--font-mono); text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); margin-bottom:0.7rem; }
+  .toggle-row{ display:flex; align-items:center; justify-content:space-between; padding:0.55rem 0.3rem; border-radius:var(--radius); }
+  .toggle-row + .toggle-row{ border-top:1px solid var(--thread-line); }
+  .switch{ width:2.6rem; height:1.5rem; border-radius:1rem; border:2px solid var(--ink); background:var(--paper); position:relative; flex-shrink:0; }
+  .switch .dot{ position:absolute; top:1px; left:1px; width:1rem; height:1rem; border-radius:50%; background:var(--ink); transition:left .15s; }
+  .switch.on{ background:var(--indigo); }
+  .switch.on .dot{ left:calc(100% - 1.15rem); background:#fff; }
+  html[data-contrast="high"] .switch.on .dot{ background:#000; }
+  .size-row{ display:flex; gap:0.4rem; margin-top:0.4rem; }
+  .size-btn{ flex:1; border:2px solid var(--ink); background:var(--paper); border-radius:var(--radius); padding:0.3rem 0; font-family:var(--font-mono); font-size:0.8rem; }
+  .size-btn.active{ background:var(--indigo); color:#fff; }
+  html[data-contrast="high"] .size-btn.active{ color:#000; }
+  .panel select{ width:100%; padding:0.5rem; border:2px solid var(--thread-line); border-radius:var(--radius); background:var(--paper); margin-top:0.3rem; }
+  .panel-section{ margin-bottom:1rem; }
+  .panel-section:last-child{ margin-bottom:0; }
+
+  main.body{ flex:1; padding:2rem 1.6rem 3rem; max-width:960px; margin:0 auto; width:100%; }
+  .greet{ font-size:1.7rem; margin-bottom:0.2rem; }
+  .greet-sub{ color:var(--ink-soft); margin-bottom:1.6rem; }
+  .action-row{ display:flex; gap:0.8rem; flex-wrap:wrap; margin-bottom:2rem; }
+
+  .gallery-title{ display:flex; align-items:center; gap:0.6rem; font-size:1.1rem; font-family:var(--font-mono); text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); margin-bottom:1rem; }
+  .gallery-title .rule{ flex:1; height:1px; background:var(--thread-line); }
+  .gallery{ display:grid; grid-template-columns:repeat(auto-fill, minmax(210px,1fr)); gap:1.1rem; }
+  .card{ background:var(--card); border:2px solid var(--ink); border-radius:6px; overflow:hidden; box-shadow:var(--shadow); }
+  .card img{ width:100%; height:150px; object-fit:cover; display:block; border-bottom:2px solid var(--ink); }
+  .card-body{ padding:0.8rem; }
+  .card-cat{ font-family:var(--font-mono); font-size:0.7rem; text-transform:uppercase; color:var(--madder); }
+  .card-desc{ font-size:0.88rem; margin-top:0.25rem; color:var(--ink-soft); line-height:1.4; }
+  .card-price{ margin-top:0.5rem; font-weight:700; font-family:var(--font-mono); }
+
+  .empty-state{ border:2px dashed var(--thread-line); border-radius:6px; padding:2.4rem 1.5rem; text-align:center; color:var(--ink-soft); }
+  .empty-state .stamp{ margin-bottom:0.8rem; }
+
+  /* ---------- Upload flow ---------- */
+  .upload-screen{ max-width:560px; margin:0 auto; }
+  .dropzone{ border:2px dashed var(--thread-line); border-radius:6px; padding:2.2rem 1.2rem; text-align:center; cursor:pointer; background:var(--card); }
+  .dropzone:hover{ border-color:var(--indigo); }
+  .preview-wrap{ text-align:center; margin-bottom:1.2rem; }
+  .preview-wrap img{ max-width:100%; max-height:260px; border:2px solid var(--ink); border-radius:6px; }
+  .ai-status{ display:flex; align-items:center; gap:0.6rem; font-family:var(--font-mono); font-size:0.85rem; color:var(--indigo); margin:0.9rem 0; }
+  .spinner{ width:1rem; height:1rem; border:2px solid var(--thread-line); border-top-color:var(--indigo); border-radius:50%; animation:spin 0.8s linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  textarea{ width:100%; padding:0.65rem 0.7rem; border:2px solid var(--thread-line); border-radius:var(--radius); background:var(--paper); color:var(--ink); resize:vertical; min-height:5rem; }
+
+  /* ---------- Thank you ---------- */
+  .thankyou{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:2rem; }
+  .thankyou h2{ font-size:2rem; margin-top:1.2rem; }
+  .thankyou p{ color:var(--ink-soft); margin-top:0.5rem; max-width:40ch; }
+
+  .footer-note{ text-align:center; color:var(--ink-soft); font-size:0.8rem; padding:1rem; font-family:var(--font-mono); }
+  .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script>
+/* ============================= i18n ============================= */
+const ANTHROPIC_API_KEY = 'your_api_key';
+
+const I18N = {
+  en:{ brand:"Karigari", eyebrow:"A question worth asking", thesis1:"Can an artisan become ", thesis2:"globally visible", thesis3:" without becoming digitally fluent?",
+    thesisSub:"Karigari puts the camera and the marketplace in one place — built for makers, not for people who already know how to use apps.",
+    signIn:"Sign in", createAccount:"Create account", name:"Name", dob:"Date of birth", contact:"Email or phone number", udid:"UDID (optional)",
+    udidHint:"Unique Disability ID — only if you have one. Leave blank otherwise.", gender:"Gender", selectGender:"Select one", male:"Male", female:"Female", other:"Other",
+    prefer:"Prefer not to say", email:"Email", welcome:"Welcome back", welcomeSub:"Enter your name and email to continue.",
+    signupSub:"Tell us a little about yourself to get your stamp.", newHere:"New here?", already:"Already have an account?",
+    noAccount:"We couldn't find an account with that name and email. Try signing up instead.", fillRequired:"Please fill in all required fields.",
+    home:"Home", upload:"Upload a product", greet:"Welcome, ", greetSub:"This is your gallery — everything you've made visible to the world.",
+    yourProducts:"Your products", addFirst:"Your gallery is empty. Press upload to add your first piece.", logout:"Log out",
+    accessibility:"Accessibility", highContrast:"High contrast", hoverHighlight:"Hover highlight", textToSpeech:"Text to speech",
+    textSize:"Text size", language:"Language", small:"S", medium:"M", large:"L", xlarge:"XL",
+    chooseImage:"Choose a photo from your gallery", chooseImageSub:"Tap to select a picture of your product.",
+    analyzing:"Looking closely at your product…", category:"Category", description:"Description", price:"Price (₹)",
+    save:"Save product", cancel:"Cancel", back:"Back to home", thankTitle:"Thank you.", thankSub:"Your craft is now visible. Buyers around the world can find it in your gallery.",
+    priceholder:"e.g. 799", descHint:"We've written a starting description from your photo — change anything you like.",
+  },
+  hi:{ brand:"Karigari", eyebrow:"एक ज़रूरी सवाल", thesis1:"क्या कोई कारीगर डिजिटल रूप से निपुण हुए बिना ", thesis2:"वैश्विक स्तर पर दिखाई", thesis3:" दे सकता है?",
+    thesisSub:"Karigari कैमरा और बाज़ार को एक ही जगह लाता है — यह उन कारीगरों के लिए बना है जो पहले से ऐप चलाना नहीं जानते।",
+    signIn:"लॉग इन करें", createAccount:"खाता बनाएं", name:"नाम", dob:"जन्म तिथि", contact:"ईमेल या फ़ोन नंबर", udid:"यूडीआईडी (वैकल्पिक)",
+    udidHint:"यूनिक डिसेबिलिटी आईडी — अगर आपके पास है तभी भरें।", gender:"लिंग", selectGender:"चुनें", male:"पुरुष", female:"महिला", other:"अन्य",
+    prefer:"नहीं बताना चाहते", email:"ईमेल", welcome:"वापसी पर स्वागत है", welcomeSub:"जारी रखने के लिए अपना नाम और ईमेल दर्ज करें।",
+    signupSub:"अपना स्टाम्प पाने के लिए हमें अपने बारे में थोड़ा बताएं।", newHere:"नए हैं?", already:"पहले से खाता है?",
+    noAccount:"इस नाम और ईमेल से कोई खाता नहीं मिला। कृपया साइन अप करें।", fillRequired:"कृपया सभी आवश्यक जानकारी भरें।",
+    home:"होम", upload:"उत्पाद अपलोड करें", greet:"स्वागत है, ", greetSub:"यह आपकी गैलरी है — जो कुछ आपने दुनिया को दिखाया है।",
+    yourProducts:"आपके उत्पाद", addFirst:"आपकी गैलरी खाली है। पहला उत्पाद जोड़ने के लिए अपलोड दबाएं।", logout:"लॉग आउट",
+    accessibility:"सुगम्यता", highContrast:"उच्च कंट्रास्ट", hoverHighlight:"होवर हाइलाइट", textToSpeech:"टेक्स्ट टू स्पीच",
+    textSize:"टेक्स्ट आकार", language:"भाषा", small:"S", medium:"M", large:"L", xlarge:"XL",
+    chooseImage:"अपनी गैलरी से एक फ़ोटो चुनें", chooseImageSub:"अपने उत्पाद की तस्वीर चुनने के लिए टैप करें।",
+    analyzing:"आपके उत्पाद को ध्यान से देखा जा रहा है…", category:"श्रेणी", description:"विवरण", price:"कीमत (₹)",
+    save:"उत्पाद सहेजें", cancel:"रद्द करें", back:"होम पर वापस जाएं", thankTitle:"धन्यवाद।", thankSub:"आपकी कारीगरी अब दुनिया को दिखाई देती है। दुनिया भर के खरीदार इसे आपकी गैलरी में पा सकते हैं।",
+    priceholder:"जैसे 799", descHint:"हमने आपकी फ़ोटो से एक शुरुआती विवरण लिखा है — जो चाहें बदल दें।",
+  },
+  kn:{ brand:"Karigari", eyebrow:"ಕೇಳಬೇಕಾದ ಪ್ರಶ್ನೆ", thesis1:"ಒಬ್ಬ ಕುಶಲಕರ್ಮಿ ಡಿಜಿಟಲ್ ಪರಿಣತಿ ಇಲ್ಲದೆ ", thesis2:"ಜಾಗತಿಕವಾಗಿ ಗೋಚರ", thesis3:" ಆಗಬಹುದೇ?",
+    thesisSub:"Karigari ಕ್ಯಾಮೆರಾ ಮತ್ತು ಮಾರುಕಟ್ಟೆಯನ್ನು ಒಂದೇ ಸ್ಥಳದಲ್ಲಿ ತರುತ್ತದೆ — ಆಪ್ ಗೊತ್ತಿಲ್ಲದ ಕುಶಲಕರ್ಮಿಗಳಿಗಾಗಿ ರೂಪಿಸಲಾಗಿದೆ.",
+    signIn:"ಲಾಗಿನ್ ಮಾಡಿ", createAccount:"ಖಾತೆ ರಚಿಸಿ", name:"ಹೆಸರು", dob:"ಹುಟ್ಟಿದ ದಿನಾಂಕ", contact:"ಇಮೇಲ್ ಅಥವಾ ಫೋನ್ ಸಂಖ್ಯೆ", udid:"ಯುಡಿಐಡಿ (ಐಚ್ಛಿಕ)",
+    udidHint:"ಯುನಿಕ್ ಡಿಸೆಬಿಲಿಟಿ ಐಡಿ — ಇದ್ದರೆ ಮಾತ್ರ ಭರ್ತಿ ಮಾಡಿ.", gender:"ಲಿಂಗ", selectGender:"ಆಯ್ಕೆಮಾಡಿ", male:"ಪುರುಷ", female:"ಮಹಿಳೆ", other:"ಇತರೆ",
+    prefer:"ಹೇಳಲು ಇಚ್ಛಿಸುವುದಿಲ್ಲ", email:"ಇಮೇಲ್", welcome:"ಮತ್ತೆ ಸ್ವಾಗತ", welcomeSub:"ಮುಂದುವರಿಸಲು ನಿಮ್ಮ ಹೆಸರು ಮತ್ತು ಇಮೇಲ್ ನಮೂದಿಸಿ.",
+    signupSub:"ನಿಮ್ಮ ಸ್ಟಾಂಪ್ ಪಡೆಯಲು ನಿಮ್ಮ ಬಗ್ಗೆ ಸ್ವಲ್ಪ ತಿಳಿಸಿ.", newHere:"ಹೊಸಬರೇ?", already:"ಈಗಾಗಲೇ ಖಾತೆ ಇದೆಯೇ?",
+    noAccount:"ಈ ಹೆಸರು ಮತ್ತು ಇಮೇಲ್‌ನೊಂದಿಗೆ ಖಾತೆ ಕಂಡುಬಂದಿಲ್ಲ. ದಯವಿಟ್ಟು ಸೈನ್ ಅಪ್ ಮಾಡಿ.", fillRequired:"ದಯವಿಟ್ಟು ಎಲ್ಲಾ ಅಗತ್ಯ ಮಾಹಿತಿ ಭರ್ತಿ ಮಾಡಿ.",
+    home:"ಮುಖಪುಟ", upload:"ಉತ್ಪನ್ನ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ", greet:"ಸ್ವಾಗತ, ", greetSub:"ಇದು ನಿಮ್ಮ ಗ್ಯಾಲರಿ — ನೀವು ಜಗತ್ತಿಗೆ ತೋರಿಸಿದ್ದೆಲ್ಲ.",
+    yourProducts:"ನಿಮ್ಮ ಉತ್ಪನ್ನಗಳು", addFirst:"ನಿಮ್ಮ ಗ್ಯಾಲರಿ ಖಾಲಿ ಇದೆ. ಮೊದಲ ಉತ್ಪನ್ನ ಸೇರಿಸಲು ಅಪ್‌ಲೋಡ್ ಒತ್ತಿ.", logout:"ಲಾಗ್ಔಟ್",
+    accessibility:"ಪ್ರವೇಶಿಸುವಿಕೆ", highContrast:"ಹೈ ಕಾಂಟ್ರಾಸ್ಟ್", hoverHighlight:"ಹೋವರ್ ಹೈಲೈಟ್", textToSpeech:"ಪಠ್ಯದಿಂದ ಧ್ವನಿ",
+    textSize:"ಪಠ್ಯ ಗಾತ್ರ", language:"ಭಾಷೆ", small:"S", medium:"M", large:"L", xlarge:"XL",
+    chooseImage:"ನಿಮ್ಮ ಗ್ಯಾಲರಿಯಿಂದ ಫೋಟೋ ಆರಿಸಿ", chooseImageSub:"ನಿಮ್ಮ ಉತ್ಪನ್ನದ ಚಿತ್ರ ಆಯ್ಕೆ ಮಾಡಲು ಟ್ಯಾಪ್ ಮಾಡಿ.",
+    analyzing:"ನಿಮ್ಮ ಉತ್ಪನ್ನವನ್ನು ಸೂಕ್ಷ್ಮವಾಗಿ ನೋಡಲಾಗುತ್ತಿದೆ…", category:"ವರ್ಗ", description:"ವಿವರಣೆ", price:"ಬೆಲೆ (₹)",
+    save:"ಉತ್ಪನ್ನ ಉಳಿಸಿ", cancel:"ರದ್ದುಗೊಳಿಸಿ", back:"ಮುಖಪುಟಕ್ಕೆ ಹಿಂತಿರುಗಿ", thankTitle:"ಧನ್ಯವಾದಗಳು.", thankSub:"ನಿಮ್ಮ ಕುಶಲಕಲೆ ಈಗ ಜಗತ್ತಿಗೆ ಗೋಚರಿಸುತ್ತದೆ.",
+    priceholder:"ಉದಾ 799", descHint:"ನಿಮ್ಮ ಫೋಟೋದಿಂದ ನಾವು ಆರಂಭಿಕ ವಿವರಣೆ ಬರೆದಿದ್ದೇವೆ — ಬೇಕಾದ್ದನ್ನು ಬದಲಾಯಿಸಿ.",
+  },
+  ta:{ brand:"Karigari", eyebrow:"கேட்கத்தக்க கேள்வி", thesis1:"ஒரு கைவினைஞர் டிஜிட்டல் திறமை இல்லாமல் ", thesis2:"உலகளவில் தெரியும்படி", thesis3:" ஆக முடியுமா?",
+    thesisSub:"Karigari கேமராவையும் சந்தையையும் ஒரே இடத்தில் இணைக்கிறது — ஆப் பயன்பாடு தெரியாத கைவினைஞர்களுக்காக.",
+    signIn:"உள்நுழை", createAccount:"கணக்கை உருவாக்கு", name:"பெயர்", dob:"பிறந்த தேதி", contact:"மின்னஞ்சல் அல்லது தொலைபேசி எண்", udid:"யுடிஐடி (விருப்பம்)",
+    udidHint:"தனிச் சிறப்பு அடையாள எண் — இருந்தால் மட்டும் நிரப்பவும்.", gender:"பாலினம்", selectGender:"தேர்ந்தெடுக்கவும்", male:"ஆண்", female:"பெண்", other:"மற்றவை",
+    prefer:"சொல்ல விரும்பவில்லை", email:"மின்னஞ்சல்", welcome:"மீண்டும் வரவேற்கிறோம்", welcomeSub:"தொடர உங்கள் பெயர் மற்றும் மின்னஞ்சலை உள்ளிடவும்.",
+    signupSub:"உங்கள் முத்திரையைப் பெற உங்களைப் பற்றி கொஞ்சம் சொல்லுங்கள்.", newHere:"புதியவரா?", already:"ஏற்கனவே கணக்கு உள்ளதா?",
+    noAccount:"இந்தப் பெயர் மற்றும் மின்னஞ்சலுடன் கணக்கு இல்லை. பதிவு செய்யவும்.", fillRequired:"தேவையான தகவல்களை நிரப்பவும்.",
+    home:"முகப்பு", upload:"தயாரிப்பை பதிவேற்று", greet:"வரவேற்பு, ", greetSub:"இது உங்கள் கேலரி — நீங்கள் உலகிற்கு காட்டியவை.",
+    yourProducts:"உங்கள் தயாரிப்புகள்", addFirst:"உங்கள் கேலரி காலியாக உள்ளது. முதல் தயாரிப்பைச் சேர்க்க பதிவேற்று அழுத்தவும்.", logout:"வெளியேறு",
+    accessibility:"அணுகல்தன்மை", highContrast:"அதிக மாறுபாடு", hoverHighlight:"ஹோவர் சிறப்பம்சம்", textToSpeech:"உரையிலிருந்து பேச்சு",
+    textSize:"உரை அளவு", language:"மொழி", small:"S", medium:"M", large:"L", xlarge:"XL",
+    chooseImage:"உங்கள் கேலரியிலிருந்து புகைப்படம் தேர்வு செய்யவும்", chooseImageSub:"உங்கள் தயாரிப்பின் படத்தைத் தேர்வு செய்ய தட்டவும்.",
+    analyzing:"உங்கள் தயாரிப்பை உன்னிப்பாகப் பார்க்கிறோம்…", category:"வகை", description:"விளக்கம்", price:"விலை (₹)",
+    save:"தயாரிப்பை சேமி", cancel:"ரத்துசெய்", back:"முகப்புக்குத் திரும்பு", thankTitle:"நன்றி.", thankSub:"உங்கள் கைவினை இப்போது உலகிற்குத் தெரியும். உலகெங்கிலும் உள்ள வாங்குபவர்கள் இதை உங்கள் கேலரியில் காணலாம்.",
+    priceholder:"எ.கா 799", descHint:"உங்கள் புகைப்படத்திலிருந்து ஒரு தொடக்க விளக்கத்தை எழுதியுள்ளோம் — வேண்டியதை மாற்றவும்.",
+  },
+  te:{ brand:"Karigari", eyebrow:"అడగదగిన ప్రశ్న", thesis1:"ఒక చేతివృత్తి కళాకారుడు డిజిటల్ నైపుణ్యం లేకుండా ", thesis2:"ప్రపంచవ్యాప్తంగా కనిపించేలా", thesis3:" మారగలడా?",
+    thesisSub:"Karigari కెమెరాను, మార్కెట్‌ను ఒకే చోట తీసుకువస్తుంది — యాప్‌లు తెలియని కళాకారుల కోసం రూపొందించబడింది.",
+    signIn:"లాగిన్ చేయండి", createAccount:"ఖాతా సృష్టించండి", name:"పేరు", dob:"పుట్టిన తేదీ", contact:"ఇమెయిల్ లేదా ఫోన్ నంబర్", udid:"యుడిఐడి (ఐచ్ఛికం)",
+    udidHint:"యూనిక్ డిజేబిలిటీ ఐడి — ఉంటే మాత్రమే నింపండి.", gender:"లింగం", selectGender:"ఎంచుకోండి", male:"పురుషుడు", female:"స్త్రీ", other:"ఇతర",
+    prefer:"చెప్పదలచుకోలేదు", email:"ఇమెయిల్", welcome:"తిరిగి స్వాగతం", welcomeSub:"కొనసాగించడానికి మీ పేరు మరియు ఇమెయిల్ నమోదు చేయండి.",
+    signupSub:"మీ స్టాంప్ పొందడానికి మీ గురించి కొంచెం చెప్పండి.", newHere:"కొత్తవారా?", already:"ఇప్పటికే ఖాతా ఉందా?",
+    noAccount:"ఈ పేరు మరియు ఇమెయిల్‌తో ఖాతా కనుగొనబడలేదు. దయచేసి సైన్ అప్ చేయండి.", fillRequired:"దయచేసి అవసరమైన వివరాలు నింపండి.",
+    home:"హోమ్", upload:"ఉత్పత్తిని అప్‌లోడ్ చేయండి", greet:"స్వాగతం, ", greetSub:"ఇది మీ గ్యాలరీ — మీరు ప్రపంచానికి చూపించినవన్నీ.",
+    yourProducts:"మీ ఉత్పత్తులు", addFirst:"మీ గ్యాలరీ ఖాళీగా ఉంది. మొదటి ఉత్పత్తిని జోడించడానికి అప్‌లోడ్ నొక్కండి.", logout:"లాగ్అవుట్",
+    accessibility:"ప్రాప్యత", highContrast:"అధిక కాంట్రాస్ట్", hoverHighlight:"హోవర్ హైలైట్", textToSpeech:"టెక్స్ట్ టు స్పీచ్",
+    textSize:"టెక్స్ట్ పరిమాణం", language:"భాష", small:"S", medium:"M", large:"L", xlarge:"XL",
+    chooseImage:"మీ గ్యాలరీ నుండి ఫోటో ఎంచుకోండి", chooseImageSub:"మీ ఉత్పత్తి చిత్రాన్ని ఎంచుకోవడానికి నొక్కండి.",
+    analyzing:"మీ ఉత్పత్తిని జాగ్రత్తగా చూస్తున్నాము…", category:"వర్గం", description:"వివరణ", price:"ధర (₹)",
+    save:"ఉత్పత్తిని సేవ్ చేయండి", cancel:"రద్దు చేయండి", back:"హోమ్‌కి తిరిగి వెళ్లండి", thankTitle:"ధన్యవాదాలు.", thankSub:"మీ హస్తకళ ఇప్పుడు ప్రపంచానికి కనిపిస్తుంది.",
+    priceholder:"ఉదా 799", descHint:"మీ ఫోటో నుండి మేము ఆరంభ వివరణ రాశాము — మీకు నచ్చినట్లు మార్చుకోండి.",
+  },
+  ml:{ brand:"Karigari", eyebrow:"ചോദിക്കേണ്ട ചോദ്യം", thesis1:"ഒരു കരകൗശല വിദഗ്ധന് ഡിജിറ്റൽ പ്രാവീണ്യമില്ലാതെ ", thesis2:"ആഗോള തലത്തിൽ ദൃശ്യമാകാൻ", thesis3:" കഴിയുമോ?",
+    thesisSub:"Karigari ക്യാമറയും മാർക്കറ്റും ഒരിടത്ത് കൊണ്ടുവരുന്നു — ആപ്പുകൾ അറിയാത്ത കരകൗശല വിദഗ്ധർക്കായി രൂപകൽപ്പന ചെയ്തത്.",
+    signIn:"ലോഗിൻ ചെയ്യുക", createAccount:"അക്കൗണ്ട് സൃഷ്ടിക്കുക", name:"പേര്", dob:"ജനനത്തീയതി", contact:"ഇമെയിൽ അല്ലെങ്കിൽ ഫോൺ നമ്പർ", udid:"യുഡിഐഡി (ഓപ്ഷണൽ)",
+    udidHint:"യുണീക് ഡിസെബിലിറ്റി ഐഡി — ഉണ്ടെങ്കിൽ മാത്രം പൂരിപ്പിക്കുക.", gender:"ലിംഗം", selectGender:"തിരഞ്ഞെടുക്കുക", male:"പുരുഷൻ", female:"സ്ത്രീ", other:"മറ്റുള്ളവ",
+    prefer:"പറയാൻ താല്പര്യമില്ല", email:"ഇമെയിൽ", welcome:"തിരികെ സ്വാഗതം", welcomeSub:"തുടരാൻ നിങ്ങളുടെ പേരും ഇമെയിലും നൽകുക.",
+    signupSub:"നിങ്ങളുടെ സ്റ്റാമ്പ് ലഭിക്കാൻ നിങ്ങളെക്കുറിച്ച് അല്പം പറയുക.", newHere:"പുതിയ ആളാണോ?", already:"ഇതിനകം അക്കൗണ്ട് ഉണ്ടോ?",
+    noAccount:"ഈ പേരും ഇമെയിലും ഉള്ള അക്കൗണ്ട് കണ്ടെത്തിയില്ല. ദയവായി സൈൻ അപ്പ് ചെയ്യുക.", fillRequired:"ദയവായി ആവശ്യമായ വിവരങ്ങൾ പൂരിപ്പിക്കുക.",
+    home:"ഹോം", upload:"ഉൽപ്പന്നം അപ്‌ലോഡ് ചെയ്യുക", greet:"സ്വാഗതം, ", greetSub:"ഇത് നിങ്ങളുടെ ഗാലറിയാണ് — നിങ്ങൾ ലോകത്തിന് കാണിച്ചതെല്ലാം.",
+    yourProducts:"നിങ്ങളുടെ ഉൽപ്പന്നങ്ങൾ", addFirst:"നിങ്ങളുടെ ഗാലറി ശൂന്യമാണ്. ആദ്യ ഉൽപ്പന്നം ചേർക്കാൻ അപ്‌ലോഡ് അമർത്തുക.", logout:"ലോഗ്ഔട്ട്",
+    accessibility:"പ്രാപ്യത", highContrast:"ഉയർന്ന കോൺട്രാസ്റ്റ്", hoverHighlight:"ഹോവർ ഹൈലൈറ്റ്", textToSpeech:"ടെക്സ്റ്റ് ടു സ്പീച്ച്",
+    textSize:"ടെക്സ്റ്റ് വലുപ്പം", language:"ഭാഷ", small:"S", medium:"M", large:"L", xlarge:"XL",
+    chooseImage:"നിങ്ങളുടെ ഗാലറിയിൽ നിന്ന് ഫോട്ടോ തിരഞ്ഞെടുക്കുക", chooseImageSub:"നിങ്ങളുടെ ഉൽപ്പന്നത്തിന്റെ ചിത്രം തിരഞ്ഞെടുക്കാൻ ടാപ്പ് ചെയ്യുക.",
+    analyzing:"നിങ്ങളുടെ ഉൽപ്പന്നം സൂക്ഷ്മമായി പരിശോധിക്കുന്നു…", category:"വിഭാഗം", description:"വിവരണം", price:"വില (₹)",
+    save:"ഉൽപ്പന്നം സേവ് ചെയ്യുക", cancel:"റദ്ദാക്കുക", back:"ഹോമിലേക്ക് മടങ്ങുക", thankTitle:"നന്ദി.", thankSub:"നിങ്ങളുടെ കരകൗശലം ഇപ്പോൾ ലോകത്തിന് ദൃശ്യമാണ്.",
+    priceholder:"ഉദാ 799", descHint:"നിങ്ങളുടെ ഫോട്ടോയിൽ നിന്ന് ഞങ്ങൾ ഒരു തുടക്ക വിവരണം എഴുതി — ഇഷ്ടമുള്ളത് മാറ്റുക.",
+  }
+};
+function t(key){ const lang = state.lang; return (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key; }
+
+/* ============================= State ============================= */
+const state = {
+  view:'landing', // landing | signup | login | home | upload | thankyou
+  lang: 'en',
+  contrast:false, hover:false, tts:false, size:'md',
+  panelOpen:false,
+  user:null, // {name,dob,contact,udid,gender,email}
+  products:[],
+  formError:'',
+  pending:null, // {dataUrl, mimeType, category, description}
+  aiStatus:'idle', // idle | loading | done | error
+};
+
+function setState(patch){ Object.assign(state, patch); render(); }
+
+/* ============================= Storage helpers ============================= */
+async function storeGet(key){
+  try{
+    if (window.storage && typeof window.storage.get === 'function') {
+      const r = await window.storage.get(key, false);
+      return r ? JSON.parse(r.value) : null;
+    }
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : null;
+    } catch (fallbackError) {
+      console.error('storage get failed', fallbackError);
+      return null;
+    }
+  }
+}
+async function storeSet(key, value){
+  try{
+    if (window.storage && typeof window.storage.set === 'function') {
+      await window.storage.set(key, JSON.stringify(value), false);
+      return;
+    }
+    localStorage.setItem(key, JSON.stringify(value));
+  }catch(e){
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (fallbackError) {
+      console.error('storage set failed', fallbackError);
+    }
+  }
+}
+
+/* ============================= Speech ============================= */
+function speak(text){
+  if(!state.tts || !text) return;
+  try{
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 0.95;
+    u.pitch = 1;
+    u.lang = navigator.language || 'en-US';
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+function ttsAttrs(text){
+  if(!state.tts) return '';
+  const safe = JSON.stringify(text).replace(/"/g,'&quot;');
+  return `onclick="speak(${safe})" data-tts="${safe.replace(/&quot;/g,'&quot;')}" tabindex="0" style="cursor:pointer" aria-label="Read aloud: ${text}" title="Read aloud"`;
+}
+function registerTtsClicks(){
+  document.querySelectorAll('[data-tts]').forEach(el => {
+    el.onclick = (event) => {
+      event.stopPropagation();
+      const text = el.getAttribute('data-tts');
+      if (text) speak(text.replace(/&quot;/g, '"').replace(/^"|"$/g, ''));
+    };
+  });
+}
+async function processProductUpload(event) {
+    const file = event.target ? event.target.files[0] : event;
+    if (!file) return;
+
+    // 1. Immediately create a local image preview URL
+    const imagePreviewUrl = URL.createObjectURL(file);
+
+    // 2. Set loading state and save initial preview
+    if (typeof state !== 'undefined') {
+        state.aiStatus = 'loading';
+        state.pending = {
+            title: 'Generating with AI...',
+            category: 'Analyzing...',
+            description: 'Analyzing your handcrafted product image...',
+            previewUrl: imagePreviewUrl
+        };
+        if (typeof render === 'function') render();
+    }
+
+    // 3. Prepare image payload for FastAPI backend
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        // Send request to backend (using full URL to prevent file:// protocol errors)
+        const response = await fetch('http://localhost:8000/api/analyze-product', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || 'Failed to analyze product');
+        }
+
+        const data = await response.json();
+
+        // 4. Update state with AI-generated results
+        if (typeof state !== 'undefined') {
+            state.aiStatus = 'done';
+            state.pending = {
+                title: data.product_title || 'Handcrafted Artisan Item',
+                category: data.category || 'Crafts',
+                description: `${data.amazon_description}\n\nKey Details:\n- Materials: ${(data.materials || []).join(', ')}\n- Colors: ${(data.color_palette || []).join(', ')}`,
+                previewUrl: imagePreviewUrl
+            };
+            if (typeof render === 'function') render();
+        }
+
+    } catch (error) {
+        console.error("AI Analysis Error:", error);
+        if (typeof state !== 'undefined') {
+            state.aiStatus = 'error';
+            state.pending = {
+                title: 'Analysis Failed',
+                category: 'Error',
+                description: 'Could not generate AI description. Make sure main.py is running on port 8000.',
+                previewUrl: imagePreviewUrl
+            };
+            if (typeof render === 'function') render();
+        }
+        alert("Backend connection failed: " + error.message);
+    }
+}
+/* ============================= Stamp SVG ============================= */
+function stampSvg(size, color){
+  color = color || 'var(--madder)';
+  return `<span class="stamp" style="width:${size}px;height:${size}px">
+    <svg viewBox="0 0 100 100" width="${size}" height="${size}">
+      <circle cx="50" cy="50" r="46" fill="none" stroke="${color}" stroke-width="4"/>
+      <circle cx="50" cy="50" r="36" fill="none" stroke="${color}" stroke-width="2"/>
+      <g stroke="${color}" stroke-width="3" stroke-linecap="round">
+        <line x1="50" y1="18" x2="50" y2="28"/>
+        <line x1="50" y1="72" x2="50" y2="82"/>
+        <line x1="18" y1="50" x2="28" y2="50"/>
+        <line x1="72" y1="50" x2="82" y2="50"/>
+        <line x1="27" y1="27" x2="34" y2="34"/>
+        <line x1="66" y1="66" x2="73" y2="73"/>
+        <line x1="73" y1="27" x2="66" y2="34"/>
+        <line x1="34" y1="66" x2="27" y2="73"/>
+      </g>
+      <circle cx="50" cy="50" r="10" fill="${color}"/>
+    </svg>
+  </span>`;
+}
+function iconProfile(){
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>`;
+}
+function iconAccessibility(){
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2"><circle cx="12" cy="5" r="2"/><path d="M4 8h16M12 8v6M8 21l2-7M16 21l-2-7M8 12l4 1 4-1"/></svg>`;
+}
+function iconUpload(){
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>`;
+}
+function iconHome(){
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11l8-7 8 7M6 10v10h12V10"/></svg>`;
+}
+
+/* ============================= Accessibility panel ============================= */
+function renderPanel(){
+  if(!state.panelOpen) return '';
+  const sizes = [['sm','small'],['md','medium'],['lg','large'],['xl','xlarge']];
+  return `<div class="panel" role="dialog" aria-label="${t('accessibility')}">
+    <div class="panel-section">
+      <h3>${t('accessibility')}</h3>
+      <div class="toggle-row" onclick="toggleFlag('contrast')"><span>${t('highContrast')}</span><span class="switch ${state.contrast?'on':''}"><span class="dot"></span></span></div>
+      <div class="toggle-row" onclick="toggleFlag('hover')"><span>${t('hoverHighlight')}</span><span class="switch ${state.hover?'on':''}"><span class="dot"></span></span></div>
+      <div class="toggle-row" onclick="toggleFlag('tts')"><span>${t('textToSpeech')}</span><span class="switch ${state.tts?'on':''}"><span class="dot"></span></span></div>
+      <p style="margin:0.65rem 0 0; color:var(--ink-soft); font-size:0.78rem; line-height:1.4;">Tip: turn it on, then tap any text to hear it read aloud.</p>
+    </div>
+    <div class="panel-section">
+      <h3>${t('textSize')}</h3>
+      <div class="size-row">
+        ${sizes.map(([k,label])=>`<button class="size-btn ${state.size===k?'active':''}" onclick="setSize('${k}')">${t(label)}</button>`).join('')}
+      </div>
+    </div>
+    <div class="panel-section">
+      <h3>${t('language')}</h3>
+      <select onchange="setLang(this.value)">
+        <option value="en" ${state.lang==='en'?'selected':''}>English</option>
+        <option value="hi" ${state.lang==='hi'?'selected':''}>हिन्दी (Hindi)</option>
+        <option value="kn" ${state.lang==='kn'?'selected':''}>ಕನ್ನಡ (Kannada)</option>
+        <option value="ta" ${state.lang==='ta'?'selected':''}>தமிழ் (Tamil)</option>
+        <option value="te" ${state.lang==='te'?'selected':''}>తెలుగు (Telugu)</option>
+        <option value="ml" ${state.lang==='ml'?'selected':''}>മലയാളം (Malayalam)</option>
+      </select>
+    </div>
+  </div>`;
+}
+function toggleFlag(flag){ state[flag] = !state[flag]; applyHtmlAttrs(); render(); }
+function setSize(k){ state.size = k; applyHtmlAttrs(); render(); }
+function setLang(v){ state.lang = v; render(); }
+function applyHtmlAttrs(){
+  document.documentElement.setAttribute('data-contrast', state.contrast?'high':'normal');
+  document.documentElement.setAttribute('data-hover', state.hover?'on':'off');
+  document.documentElement.setAttribute('data-size', state.size);
+}
+
+/* ============================= Views ============================= */
+function viewLanding(){
+  return `
+  <div class="landing">
+    <div class="landing-top">
+      <div class="brand">${stampSvg(34)}<span class="brand-name">${t('brand')}</span></div>
+    </div>
+    <div class="landing-main">
+      <div class="thesis-wrap">
+        <span class="eyebrow">${t('eyebrow')}</span>
+        <h1 class="thesis" ${ttsAttrs(t('thesis1')+t('thesis2')+t('thesis3'))}>${t('thesis1')}<em>${t('thesis2')}</em>${t('thesis3')}</h1>
+        <p class="thesis-sub">${t('thesisSub')}</p>
+        <div class="cta-row">
+          <button class="btn btn-primary btn-lg" onclick="setState({view:'login', formError:''})">${t('signIn')}</button>
+          <button class="btn btn-ghost btn-lg" onclick="setState({view:'signup', formError:''})">${t('createAccount')}</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function viewSignup(){
+  return `
+  <div class="form-screen">
+    <div class="form-card">
+      <h2>${t('createAccount')}</h2>
+      <p class="form-sub">${t('signupSub')}</p>
+      ${state.formError ? `<div class="form-error">${state.formError}</div>` : ''}
+      <form onsubmit="return handleSignup(event)">
+        <div class="field"><label for="su-name">${t('name')}</label><input id="su-name" required></div>
+        <div class="field"><label for="su-dob">${t('dob')}</label><input id="su-dob" type="date" required></div>
+        <div class="field"><label for="su-contact">${t('contact')}</label><input id="su-contact" required></div>
+        <div class="field"><label for="su-udid">${t('udid')}</label><input id="su-udid"><div class="hint">${t('udidHint')}</div></div>
+        <div class="field"><label for="su-gender">${t('gender')}</label>
+          <select id="su-gender" required>
+            <option value="">${t('selectGender')}</option>
+            <option value="female">${t('female')}</option>
+            <option value="male">${t('male')}</option>
+            <option value="other">${t('other')}</option>
+            <option value="prefer_not">${t('prefer')}</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary btn-lg">${t('createAccount')}</button>
+          <p class="switch-line">${t('already')} <a href="#" onclick="setState({view:'login', formError:''});return false;">${t('signIn')}</a></p>
+        </div>
+      </form>
+    </div>
+  </div>`;
+}
+
+function viewLogin(){
+  return `
+  <div class="form-screen">
+    <div class="form-card">
+      <h2>${t('welcome')}</h2>
+      <p class="form-sub">${t('welcomeSub')}</p>
+      ${state.formError ? `<div class="form-error">${state.formError}</div>` : ''}
+      <form onsubmit="return handleLogin(event)">
+        <div class="field"><label for="li-name">${t('name')}</label><input id="li-name" required></div>
+        <div class="field"><label for="li-email">${t('email')}</label><input id="li-email" type="email" required></div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary btn-lg">${t('signIn')}</button>
+          <p class="switch-line">${t('newHere')} <a href="#" onclick="setState({view:'signup', formError:''});return false;">${t('createAccount')}</a></p>
+        </div>
+      </form>
+    </div>
+  </div>`;
+}
+
+function topbar(){
+  return `<div class="topbar">
+    <div class="brand" style="cursor:pointer" onclick="setState({view:'home', panelOpen:false})">${stampSvg(30)}<span class="brand-name">${t('brand')}</span></div>
+    <div class="top-right">
+      <button class="icon-btn" aria-label="${t('accessibility')}" onclick="event.stopPropagation();setState({panelOpen:!state.panelOpen})">${iconAccessibility()}</button>
+      <button class="icon-btn" aria-label="${t('logout')}" title="${state.user? state.user.name:''}" onclick="handleLogout()">${iconProfile()}</button>
+      ${renderPanel()}
+    </div>
+  </div>`;
+}
+
+function viewHome(){
+  const products = state.products;
+  return `
+  ${topbar()}
+  <main class="body">
+    <h2 class="greet">${t('greet')}${state.user ? state.user.name : ''}</h2>
+    <p class="greet-sub">${t('greetSub')}</p>
+    <div class="action-row">
+      <button class="btn btn-primary btn-stamp" onclick="setState({view:'upload', pending:null, aiStatus:'idle'})">${iconUpload()} ${t('upload')}</button>
+      <button class="btn btn-ghost btn-stamp" onclick="setState({view:'home'})">${iconHome()} ${t('home')}</button>
+    </div>
+    <div class="gallery-title">${t('yourProducts')}<span class="rule"></span></div>
+    ${products.length === 0 ? `
+      <div class="empty-state">${stampSvg(46,'var(--thread-line)')}<p>${t('addFirst')}</p></div>
+    ` : `
+      <div class="gallery">
+        ${products.map(p => `
+          <div class="card">
+            <img src="${p.dataUrl}" alt="${p.category}">
+            <div class="card-body">
+              <div class="card-cat">${p.category}</div>
+              <div class="card-desc">${p.description}</div>
+              <div class="card-price">₹${p.price}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `}
+  </main>`;
+}
+
+function viewUpload(){
+  const p = state.pending;
+  return `
+  ${topbar()}
+  <main class="body">
+    <div class="upload-screen">
+      <div class="action-row">
+        <button class="btn btn-ghost btn-stamp" onclick="setState({view:'home'})">${iconHome()} ${t('home')}</button>
+      </div>
+      <h2>${t('upload')}</h2>
+      ${!p ? `
+        <label class="dropzone" style="display:block;margin-top:1rem">
+          <input type="file" accept="image/*" class="hidden" onchange="processProductUpload(event)">
+          ${iconUpload()}
+          <p style="margin-top:0.6rem;font-weight:600">${t('chooseImage')}</p>
+          <p style="color:var(--ink-soft);font-size:0.88rem;margin-top:0.3rem">${t('chooseImageSub')}</p>
+        </label>
+      ` : `
+        <div style="margin-top:1rem">
+          <div class="preview-wrap"><img src="${p.dataUrl}" alt="preview"></div>
+          ${state.aiStatus==='loading' ? `<div class="ai-status"><span class="spinner"></span>${t('analyzing')}</div>` : ''}
+          <form onsubmit="return handleSaveProduct(event)">
+            <div class="field"><label for="up-cat">${t('category')}</label><input id="up-cat" value="${p.category||''}" required></div>
+            <div class="field"><label for="up-desc">${t('description')}</label><textarea id="up-desc" required>${p.description||''}</textarea><div class="hint">${t('descHint')}</div></div>
+            <div class="field"><label for="up-price">${t('price')}</label><input id="up-price" type="number" min="0" placeholder="${t('priceholder')}" required></div>
+            <div class="form-actions" style="flex-direction:row">
+              <button type="submit" class="btn btn-primary" style="flex:1">${t('save')}</button>
+              <button type="button" class="btn btn-ghost" style="flex:1" onclick="setState({view:'home'})">${t('cancel')}</button>
+            </div>
+          </form>
+        </div>
+      `}
+    </div>
+  </main>`;
+}
+
+function viewThankyou(){
+  return `
+  <div class="thankyou">
+    <div class="stamp-press">${stampSvg(90)}</div>
+    <h2>${t('thankTitle')}</h2>
+    <p>${t('thankSub')}</p>
+    <button class="btn btn-primary btn-lg" style="margin-top:1.6rem" onclick="setState({view:'home'})">${t('back')}</button>
+  </div>`;
+}
+
+function render(){
+  applyHtmlAttrs();
+  let html = '';
+  if(state.view==='landing') html = viewLanding();
+  else if(state.view==='signup') html = viewSignup();
+  else if(state.view==='login') html = viewLogin();
+  else if(state.view==='home') html = viewHome();
+  else if(state.view==='upload') html = viewUpload();
+  else if(state.view==='thankyou') html = viewThankyou();
+  document.getElementById('app').innerHTML = html + `<div class="footer-note">${t('brand')} · ${t('eyebrow')}</div>`;
+  registerTtsClicks();
+  if(state.view==='thankyou'){
+    setTimeout(()=>{ if(state.view==='thankyou') setState({view:'home'}); }, 4000);
+  }
+}
+document.addEventListener('click', (e)=>{
+  if(state.panelOpen && !e.target.closest('.panel') && !e.target.closest('.icon-btn')){
+    setState({panelOpen:false});
+  }
+});
+
+/* ============================= Auth handlers ============================= */
+async function handleSignup(e){
+  e.preventDefault();
+  const name = document.getElementById('su-name').value.trim();
+  const dob = document.getElementById('su-dob').value;
+  const contact = document.getElementById('su-contact').value.trim();
+  const udid = document.getElementById('su-udid').value.trim();
+  const gender = document.getElementById('su-gender').value;
+  if(!name || !dob || !contact || !gender){ setState({formError:t('fillRequired')}); return false; }
+  const email = contact.includes('@') ? contact.toLowerCase() : contact;
+  const user = {name, dob, contact, udid, gender, email};
+  await storeSet('user:'+email, user);
+  await storeSet('products:'+email, []);
+  setState({user, products:[], view:'home', formError:''});
+  return false;
+}
+
+async function handleLogin(e){
+  e.preventDefault();
+  const name = document.getElementById('li-name').value.trim();
+  const email = document.getElementById('li-email').value.trim().toLowerCase();
+  const user = await storeGet('user:'+email);
+  if(!user || user.name.trim().toLowerCase() !== name.toLowerCase()){
+    setState({formError:t('noAccount')});
+    return false;
+  }
+  const products = await storeGet('products:'+email) || [];
+  setState({user, products, view:'home', formError:''});
+  return false;
+}
+
+function handleLogout(){
+  setState({user:null, products:[], view:'landing', panelOpen:false});
+}
+
+/* ============================= Upload + AI handlers ============================= */
+function fileToDataUrl(file){
+  return new Promise((resolve,reject)=>{
+    const r = new FileReader();
+    r.onload = ()=>resolve(r.result);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+
+async function handleFileSelect(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  if (!ANTHROPIC_API_KEY || ANTHROPIC_API_KEY === 'PASTE_YOUR_ANTHROPIC_API_KEY_HERE') {
+    setState({aiStatus:'error'});
+    alert('Add your Anthropic API key in the script before using AI product descriptions.');
+    return;
+  }
+  const dataUrl = await fileToDataUrl(file);
+  setState({pending:{dataUrl, mimeType:file.type, category:'', description:''}, aiStatus:'loading', view:'upload'});
+  try{
+    const base64 = dataUrl.split(',')[1];
+    const langNames = {en:'English',hi:'Hindi',kn:'Kannada',ta:'Tamil',te:'Telugu',ml:'Malayalam'};
+    const resp = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01"
+      },
+      body: JSON.stringify({
+        model:"claude-sonnet-4-6",
+        max_tokens:1000,
+        messages:[{
+          role:"user",
+          content:[
+            {type:"image", source:{type:"base64", media_type: file.type || "image/jpeg", data: base64}},
+            {type:"text", text:`You are helping an artisan list a handmade product online. Look at the photo and respond with ONLY a JSON object, no preamble, no markdown fences, in this exact shape: {"category":"short product category, 2-4 words","description":"a warm, honest 1-2 sentence marketplace description of the product a buyer would see"}. Write the category and description in ${langNames[state.lang]}.`}
+          ]
+        }]
+      })
+    });
+    if(!resp.ok){
+      throw new Error(`AI request failed with status ${resp.status}`);
+    }
+    const data = await resp.json();
+    const text = (data.content||[]).map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(text);
+    setState({pending:{...state.pending, category:parsed.category||'', description:parsed.description||''}, aiStatus:'done'});
+  }catch(err){
+    console.error('AI categorize failed', err);
+    setState({aiStatus:'error'});
+  }
+}
+
+async function handleSaveProduct(e){
+  e.preventDefault();
+  const category = document.getElementById('up-cat').value.trim();
+  const description = document.getElementById('up-desc').value.trim();
+  const price = document.getElementById('up-price').value;
+  const product = {id: Date.now(), dataUrl: state.pending.dataUrl, category, description, price};
+  const products = [product, ...state.products];
+  if(state.user){ await storeSet('products:'+state.user.email, products); }
+  setState({products, pending:null, view:'thankyou'});
+  return false;
+}
+
+/* ============================= Init ============================= */
+render();
+</script>
+</body>
+</html>

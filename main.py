@@ -1,4 +1,5 @@
 import json
+from dotenv import load_dotenv
 import os
 from io import BytesIO
 from fastapi import FastAPI, File, UploadFile, HTTPException
@@ -8,10 +9,11 @@ from PIL import Image
 from pydantic import BaseModel, Field
 from google import genai
 from google.genai import types
-from dotenv import load_dotenv
+
 
 # Load environment variables
 load_dotenv()
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 app = FastAPI()
 
@@ -51,7 +53,7 @@ async def analyze_product(file: UploadFile = File(...)):
         image = Image.open(BytesIO(contents))
 
         # Call Gemini API
-        client = genai.Client()
+        client = genai.Client(api_key=GEMINI_API_KEY)
         prompt = (
             "You are an expert e-commerce cataloger. Analyze this product image "
             "and generate structured Amazon-ready metadata."

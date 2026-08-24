@@ -157,7 +157,7 @@
   .ai-status{ display:flex; align-items:center; gap:0.6rem; font-family:var(--font-mono); font-size:0.85rem; color:var(--indigo); margin:0.9rem 0; }
   .spinner{ width:1rem; height:1rem; border:2px solid var(--thread-line); border-top-color:var(--indigo); border-radius:50%; animation:spin 0.8s linear infinite; }
   @keyframes spin{ to{ transform:rotate(360deg); } }
-  textarea{ width:100%; padding:0.65rem 0.7rem; border:2px solid var(--thread-line); border-radius:var(--radius); background:var(--paper); color:var(--ink); resize:vertical; min-height:5rem; }
+  textarea{ width:100%; padding:0.65rem 0.7rem; border:2px solid var(--thread-line); border-radius:var(--radius); background:var(--paper); color:var(--ink); resize:vertical; min-height:10rem; }
 
   /* ---------- Thank you ---------- */
   .thankyou{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:2rem; }
@@ -173,7 +173,7 @@
 
 <script>
 /* ============================= i18n ============================= */
-const ANTHROPIC_API_KEY = 'your_api_key';
+
 
 const I18N = {
   en:{ brand:"Karigari", eyebrow:"A question worth asking", thesis1:"Can an artisan become ", thesis2:"globally visible", thesis3:" without becoming digitally fluent?",
@@ -712,51 +712,6 @@ function fileToDataUrl(file){
     r.onerror = reject;
     r.readAsDataURL(file);
   });
-}
-
-async function handleFileSelect(e){
-  const file = e.target.files[0];
-  if(!file) return;
-  if (!ANTHROPIC_API_KEY || ANTHROPIC_API_KEY === 'PASTE_YOUR_ANTHROPIC_API_KEY_HERE') {
-    setState({aiStatus:'error'});
-    alert('Add your Anthropic API key in the script before using AI product descriptions.');
-    return;
-  }
-  const dataUrl = await fileToDataUrl(file);
-  setState({pending:{dataUrl, mimeType:file.type, category:'', description:''}, aiStatus:'loading', view:'upload'});
-  try{
-    const base64 = dataUrl.split(',')[1];
-    const langNames = {en:'English',hi:'Hindi',kn:'Kannada',ta:'Tamil',te:'Telugu',ml:'Malayalam'};
-    const resp = await fetch("https://api.anthropic.com/v1/messages", {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "x-api-key": ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01"
-      },
-      body: JSON.stringify({
-        model:"claude-sonnet-4-6",
-        max_tokens:1000,
-        messages:[{
-          role:"user",
-          content:[
-            {type:"image", source:{type:"base64", media_type: file.type || "image/jpeg", data: base64}},
-            {type:"text", text:`You are helping an artisan list a handmade product online. Look at the photo and respond with ONLY a JSON object, no preamble, no markdown fences, in this exact shape: {"category":"short product category, 2-4 words","description":"a warm, honest 1-2 sentence marketplace description of the product a buyer would see"}. Write the category and description in ${langNames[state.lang]}.`}
-          ]
-        }]
-      })
-    });
-    if(!resp.ok){
-      throw new Error(`AI request failed with status ${resp.status}`);
-    }
-    const data = await resp.json();
-    const text = (data.content||[]).map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
-    const parsed = JSON.parse(text);
-    setState({pending:{...state.pending, category:parsed.category||'', description:parsed.description||''}, aiStatus:'done'});
-  }catch(err){
-    console.error('AI categorize failed', err);
-    setState({aiStatus:'error'});
-  }
 }
 
 async function handleSaveProduct(e){

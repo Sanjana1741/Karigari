@@ -166,6 +166,45 @@
 
   .footer-note{ text-align:center; color:var(--ink-soft); font-size:0.8rem; padding:1rem; font-family:var(--font-mono); }
   .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+
+  /* ============================= Voice Dashboard ============================= */
+
+.voice-dashboard{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  padding:20px;
+  margin:20px 0;
+  border-radius:16px;
+  background:var(--card);
+  border:1px solid rgba(0,0,0,0.08);
+}
+
+.voice-title{
+  font-size:20px;
+  font-weight:700;
+}
+
+.voice-subtitle{
+  margin-top:5px;
+  opacity:0.7;
+}
+
+.voice-button{
+  width:60px;
+  height:60px;
+  border:none;
+  border-radius:50%;
+  cursor:pointer;
+  font-size:26px;
+  background:var(--indigo);
+  color:white;
+}
+
+.voice-button:hover{
+  transform:scale(1.05);
+}
 </style>
 </head>
 <body>
@@ -326,32 +365,150 @@ async function storeSet(key, value){
 }
 
 /* ============================= Speech ============================= */
+
 function speak(text){
-  if(!state.tts || !text) return;
-  try{
-    if (!('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.rate = 0.95;
-    u.pitch = 1;
-    u.lang = navigator.language || 'en-US';
-    window.speechSynthesis.speak(u);
-  }catch(e){}
+  if(!text) return;
+
+  if(!('speechSynthesis' in window)){
+    alert("Text-to-speech is not supported in this browser.");
+    return;
+  }
+
+  window.speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+
+  utterance.rate = 0.95;
+  utterance.pitch = 1;
+  utterance.volume = 1;
+
+  // Set language according to the selected website language
+  const languages = {
+    en: 'en-US',
+    hi: 'hi-IN',
+    kn: 'kn-IN',
+    ta: 'ta-IN',
+    te: 'te-IN',
+    ml: 'ml-IN'
+  };
+
+  utterance.lang = languages[state.lang] || 'en-US';
+
+  window.speechSynthesis.speak(utterance);
 }
 function ttsAttrs(text){
   if(!state.tts) return '';
-  const safe = JSON.stringify(text).replace(/"/g,'&quot;');
-  return `onclick="speak(${safe})" data-tts="${safe.replace(/&quot;/g,'&quot;')}" tabindex="0" style="cursor:pointer" aria-label="Read aloud: ${text}" title="Read aloud"`;
+
+  return `data-tts="${text.replace(/"/g, '&quot;')}"
+          tabindex="0"
+          style="cursor:pointer"
+          aria-label="Read aloud"
+          title="Read aloud"`;
 }
 function registerTtsClicks(){
+  if(!state.tts) return;
+
   document.querySelectorAll('[data-tts]').forEach(el => {
-    el.onclick = (event) => {
+
+    el.onclick = function(event){
       event.stopPropagation();
-      const text = el.getAttribute('data-tts');
-      if (text) speak(text.replace(/&quot;/g, '"').replace(/^"|"$/g, ''));
+
+      const text = this.getAttribute('data-tts');
+
+      if(text){
+        speak(text);
+      }
     };
+
   });
 }
+/* ============================= Voice Recognition ============================= */
+
+/* ============================= Voice Recognition ============================= */
+
+let voiceRecognition = null;
+
+function startVoiceCommand(){
+
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  // Check if browser supports speech recognition
+  if(!SpeechRecognition){
+    alert("Voice recognition is not supported in this browser. Please use Google Chrome.");
+    return;
+  }
+
+  voiceRecognition = new SpeechRecognition();
+
+  // Listen for one command at a time
+  voiceRecognition.continuous = false;
+  voiceRecognition.interimResults = false;
+
+  // Use the language selected in Karigari
+  const languages = {
+    en: 'en-IN',
+    hi: 'hi-IN',
+    kn: 'kn-IN',
+    ta: 'ta-IN',
+    te: 'te-IN',
+    ml: 'ml-IN'
+  };
+
+  voiceRecognition.lang = languages[state.lang] || 'en-IN';
+
+  // When microphone starts listening
+  voiceRecognition.onstart = function(){
+    console.log("🎤 Listening...");
+  };
+
+  // When we hear the user's voice
+  voiceRecognition.onresult = function(event){
+
+    const text = event.results[0][0].transcript;
+
+    console.log("You said:", text);
+
+    const command = text.toLowerCase();
+
+    if(command.includes("show my orders") || command.includes("show orders")){
+      alert("📦 Orders command detected!");
+    }
+    else if(command.includes("show pending orders") || command.includes("pending orders")){
+      alert("⏳ Pending orders command detected!");
+    }
+    else if(command.includes("ready to ship") || command.includes("ready orders")){
+      alert("🚚 Ready-to-ship command detected!");
+    }
+    else if(command.includes("how many orders") || command.includes("number of orders")){
+      alert("🔢 Order count command detected!");
+    }
+    else if(command.includes("how much did i earn") || command.includes("my earnings")){
+      alert("💰 Earnings command detected!");
+    }
+    else if(command.includes("show my products") || command.includes("show products")){
+      alert("🛍️ Products command detected!");
+    }
+    else if(command.includes("promote my product") || command.includes("promote product")){
+      alert("📢 Product promotion command detected!");
+    }
+    else{
+      alert("I heard: " + text + "\n\nI don't understand that command yet.");
+    }
+  };
+
+  // If something goes wrong
+  voiceRecognition.onerror = function(event){
+
+    console.error("Voice recognition error:", event.error);
+
+    alert("Could not hear you. Please try again.");
+  };
+
+  // Start microphone
+  voiceRecognition.start();
+}
+
 async function processProductUpload(event) {
     const file = event.target ? event.target.files[0] : event;
     if (!file) return;
@@ -501,7 +658,7 @@ function viewLanding(){
       <div class="thesis-wrap">
         <span class="eyebrow">${t('eyebrow')}</span>
         <h1 class="thesis" ${ttsAttrs(t('thesis1')+t('thesis2')+t('thesis3'))}>${t('thesis1')}<em>${t('thesis2')}</em>${t('thesis3')}</h1>
-        <p class="thesis-sub">${t('thesisSub')}</p>
+        <p class="thesis-sub" ${ttsAttrs(t('thesisSub'))}>${t('thesisSub')}</p>
         <div class="cta-row">
           <button class="btn btn-primary btn-lg" onclick="setState({view:'login', formError:''})">${t('signIn')}</button>
           <button class="btn btn-ghost btn-lg" onclick="setState({view:'signup', formError:''})">${t('createAccount')}</button>
@@ -576,12 +733,28 @@ function viewHome(){
   return `
   ${topbar()}
   <main class="body">
-    <h2 class="greet">${t('greet')}${state.user ? state.user.name : ''}</h2>
-    <p class="greet-sub">${t('greetSub')}</p>
+    <h2 class="greet" ${ttsAttrs(t('greet') + (state.user ? state.user.name : ''))}>
+  ${t('greet')}${state.user ? state.user.name : ''}
+</h2>
+   <p class="greet-sub" ${ttsAttrs(t('greetSub'))}>${t('greetSub')}</p>
     <div class="action-row">
       <button class="btn btn-primary btn-stamp" onclick="setState({view:'upload', pending:null, aiStatus:'idle'})">${iconUpload()} ${t('upload')}</button>
       <button class="btn btn-ghost btn-stamp" onclick="setState({view:'home'})">${iconHome()} ${t('home')}</button>
     </div>
+    <div class="voice-dashboard">
+  <div>
+    <div class="voice-title">🎤 Ask Karigari</div>
+    <div class="voice-subtitle">Tell me what you want to do</div>
+  </div>
+
+  <button
+    class="voice-button"
+    onclick="startVoiceCommand()"
+    aria-label="Start voice command"
+  >
+    🎤
+  </button>
+</div>
     <div class="gallery-title">${t('yourProducts')}<span class="rule"></span></div>
     ${products.length === 0 ? `
       <div class="empty-state">${stampSvg(46,'var(--thread-line)')}<p>${t('addFirst')}</p></div>
@@ -599,6 +772,28 @@ function viewHome(){
         `).join('')}
       </div>
     `}
+  </main>`;
+}
+function viewOrders(){
+  return `
+  ${topbar()}
+  <main class="body">
+
+    <div class="action-row">
+      <button class="btn btn-ghost btn-stamp" onclick="setState({view:'home'})">
+        ${iconHome()} Home
+      </button>
+    </div>
+
+    <h2>📦 My Orders</h2>
+
+    <div class="empty-state">
+      <p>No orders yet.</p>
+      <p style="color:var(--ink-soft);font-size:0.9rem;">
+        Your orders will appear here.
+      </p>
+    </div>
+
   </main>`;
 }
 
@@ -655,6 +850,7 @@ function render(){
   else if(state.view==='signup') html = viewSignup();
   else if(state.view==='login') html = viewLogin();
   else if(state.view==='home') html = viewHome();
+  else if(state.view==='orders') html = viewOrders();
   else if(state.view==='upload') html = viewUpload();
   else if(state.view==='thankyou') html = viewThankyou();
   document.getElementById('app').innerHTML = html + `<div class="footer-note">${t('brand')} · ${t('eyebrow')}</div>`;

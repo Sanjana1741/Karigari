@@ -1,6 +1,7 @@
 import json
 from dotenv import load_dotenv
 import os
+import time 
 from io import BytesIO
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import HTMLResponse
@@ -45,31 +46,38 @@ async def serve_home():
         return f.read()
 
 # 3. API Endpoint to process the image and return AI data
+# 3. API Endpoint to process the image and return AI data
 @app.post("/api/analyze-product")
 async def analyze_product(file: UploadFile = File(...)):
     try:
-        # Read uploaded image bytes
         contents = await file.read()
         image = Image.open(BytesIO(contents))
-
-        # Call Gemini API
         client = genai.Client(api_key=GEMINI_API_KEY)
+        
         prompt = (
             "You are an expert e-commerce cataloger. Analyze this product image "
             "and generate structured Amazon-ready metadata."
         )
-
-        response = client.models.generate_content(
-            model="gemini-3.6-flash",
-            contents=[image, prompt],
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json",
-                response_schema=ProductMetadata,
-                temperature=0.2,
-            )
-        )
-
-        return json.loads(response.text)
+        
+        # Retry up to 3 times on 503 errors
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                response = client.models.generate_content(
+                    model="gemini-3.6-flash",
+                    contents=[image, prompt],
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                        response_schema=ProductMetadata,
+                        temperature=0.2,
+                    )
+                )
+                return json.loads(response.text)
+            except Exception as e:
+                if "503" in str(e) and attempt < max_retries - 1:
+                    time.sleep(2) # Wait 2 seconds before retrying
+                    continue
+                raise e
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

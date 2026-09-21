@@ -746,6 +746,22 @@
     .voice-button:hover {
       transform: scale(1.05);
     }
+    /* ---------- One-Tap Marketing ---------- */
+.promote-btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:0.4rem;
+  width:100%;
+  margin-top:0.7rem;
+  padding:0.6rem 0.6rem;
+  border:2px solid var(--indigo);
+  background:var(--indigo);
+  color:#fff;
+  border-radius:var(--radius);
+  font-weight:600;
+  font-size:0.85rem;
+}
   </style>
 </head>
 
@@ -861,6 +877,75 @@
       }
     };
     function t(key) { const lang = state.lang; return (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key; }
+    /* ---------- One-Tap Marketing translations ---------- */
+    const MKT_UI = {
+
+  en: {
+    promote: "📢 Promote My Product",
+    workspaceTitle: "Promote My Product",
+    whatCreate: "What would you like to create?",
+    social: "Social Media",
+    whatsapp: "WhatsApp",
+    poster: "Poster",
+    styleTitle: "Choose a style",
+    audienceTitle: "Who is this for?",
+    festivalTitle: "Festival or occasion",
+    festivalNone: "None",
+    langTitle: "Content language",
+    photoTool: "Photo improvements",
+    improveLighting: "Improve lighting",
+    cleanBackground: "Clean background",
+    squareFormat: "Square format",
+    noteLabel: "Anything else?",
+    notePlaceholder: "Add something you'd like to mention...",
+    voice: "Voice input",
+    listening: "Listening...",
+    generate: "Generate Promotion",
+    regenerate: "Regenerate",
+    copyMessage: "Copy message",
+    shareWhatsapp: "Share on WhatsApp",
+    downloadPoster: "Download poster",
+    sharePoster: "Share poster",
+    myPromotions: "My Promotions",
+    handmade: "Handmade with care",
+    story: "Story",
+    short: "Short",
+    sales: "Sales"
+  },
+
+  hi: {
+    promote: "📢 मेरे उत्पाद का प्रचार करें",
+    workspaceTitle: "मेरे उत्पाद का प्रचार करें",
+    whatCreate: "आप क्या बनाना चाहते हैं?",
+    social: "सोशल मीडिया",
+    whatsapp: "WhatsApp",
+    poster: "पोस्टर",
+    styleTitle: "एक शैली चुनें",
+    audienceTitle: "यह किसके लिए है?",
+    festivalTitle: "त्योहार या अवसर",
+    festivalNone: "कोई नहीं",
+    langTitle: "सामग्री की भाषा",
+    photoTool: "फोटो सुधार",
+    improveLighting: "रोशनी सुधारें",
+    cleanBackground: "बैकग्राउंड साफ करें",
+    squareFormat: "स्क्वायर फॉर्मेट",
+    noteLabel: "कुछ और जोड़ना है?",
+    notePlaceholder: "कुछ और लिखें...",
+    voice: "वॉइस इनपुट",
+    listening: "सुन रहा है...",
+    generate: "प्रमोशन बनाएं",
+    regenerate: "फिर से बनाएं",
+    copyMessage: "मैसेज कॉपी करें",
+    shareWhatsapp: "WhatsApp पर शेयर करें",
+    downloadPoster: "पोस्टर डाउनलोड करें",
+    sharePoster: "पोस्टर शेयर करें",
+    myPromotions: "मेरे प्रमोशन",
+    handmade: "प्यार से बनाया गया",
+    story: "कहानी",
+    short: "छोटा",
+    sales: "बिक्री"
+  }
+};
 
     /* ============================= State ============================= */
     const state = {
@@ -869,10 +954,30 @@
       contrast: false, hover: false, tts: false, size: 'md',
       panelOpen: false,
       user: null, // {name,dob,contact,udid,gender,email}
-      products: [],
-      formError: '',
-      pending: null, // {dataUrl, mimeType, category, description}
-      aiStatus: 'idle', // idle | loading | done | error
+     products: [],
+promotions: [],
+formError: '',
+pending: null,
+aiStatus: 'idle',
+      marketing: {
+  open: false,
+  product: null,
+  formats: ['social', 'whatsapp', 'poster'],
+  style: 'traditional',
+  audience: 'local',
+  festival: null,
+  language: 'en',
+  note: '',
+  listening: false,
+  generated: null,
+  activeCaption: 'story',
+  variant: 0,
+  photo: {
+    lighting: false,
+    clean: false,
+    square: false
+  }
+},
     };
 
     function setState(patch) { Object.assign(state, patch); render(); }
@@ -1302,8 +1407,28 @@ function startVoiceCommand() {
           alert("🛍️ Products command detected!");
         }
         else if (detectedCommand === "promote") {
-          alert("📢 Product promotion command detected!");
-        }
+
+  if (state.products.length === 0) {
+
+    alert("📦 Please upload a product first.");
+
+    speak("Please upload a product first.");
+
+  } else if (state.products.length === 1) {
+
+    openMarketing(state.products[0].id);
+
+    speak("Opening promotion for your product.");
+
+  } else {
+
+    alert("🛍️ You have multiple products. Choose the product you want to promote.");
+
+    speak("You have multiple products. Choose the product you want to promote.");
+
+  }
+
+}
         else {
           alert("I heard: " + text + "\n\nI don't understand that command yet.");
         }
@@ -1418,6 +1543,211 @@ function startVoiceCommand() {
       function iconHome() {
         return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11l8-7 8 7M6 10v10h12V10"/></svg>`;
       }
+      /* ============================= One-Tap Marketing ============================= */
+      function defaultMarketing(product) {
+  return {
+    open: true,
+    product,
+    formats: ['social', 'whatsapp', 'poster'],
+    style: 'traditional',
+    audience: 'local',
+    festival: null,
+    language: state.lang,
+    note: '',
+    listening: false,
+    generated: null,
+    activeCaption: 'story',
+    variant: 0,
+    photo: {
+      lighting: false,
+      clean: false,
+      square: false
+    }
+  };
+}
+
+function openMarketing(productId) {
+  const product = state.products.find(
+    p => String(p.id) === String(productId)
+  );
+
+  if (!product) return;
+
+  setState({
+    marketing: defaultMarketing(product)
+  });
+}
+
+function closeMarketing() {
+  setState({
+    marketing: Object.assign({}, state.marketing, {
+      open: false
+    })
+  });
+}
+
+function toggleFormat(format) {
+  const mk = state.marketing;
+  const formats = new Set(mk.formats);
+
+  formats.has(format)
+    ? formats.delete(format)
+    : formats.add(format);
+
+  setState({
+    marketing: Object.assign({}, mk, {
+      formats: Array.from(formats)
+    })
+  });
+}
+
+function selectStyle(style) {
+  setState({
+    marketing: Object.assign({}, state.marketing, {
+      style
+    })
+  });
+}
+
+function selectAudience(audience) {
+  setState({
+    marketing: Object.assign({}, state.marketing, {
+      audience
+    })
+  });
+}
+
+function selectFestival(festival) {
+  setState({
+    marketing: Object.assign({}, state.marketing, {
+      festival
+    })
+  });
+}
+
+function setMktLang(language) {
+  setState({
+    marketing: Object.assign({}, state.marketing, {
+      language
+    })
+  });
+}
+
+function togglePhotoOpt(key) {
+  const mk = state.marketing;
+
+  const photo = Object.assign({}, mk.photo, {
+    [key]: !mk.photo[key]
+  });
+
+  setState({
+    marketing: Object.assign({}, mk, {
+      photo
+    })
+  });
+}
+
+function setActiveCaption(key) {
+  setState({
+    marketing: Object.assign({}, state.marketing, {
+      activeCaption: key
+    })
+  });
+}
+
+function photoFilterCss() {
+  const photo = state.marketing.photo || {};
+  const filters = [];
+
+  if (photo.lighting) {
+    filters.push('brightness(1.08) contrast(1.05)');
+  }
+
+  if (photo.clean) {
+    filters.push('saturate(1.12)');
+  }
+
+  return filters.length
+    ? `filter:${filters.join(' ')};`
+    : '';
+}
+async function recordPromotion(mk) {
+  const idStr = '' + mk.product.id;
+
+  const seed = idStr.split('').reduce(
+    (a, c) => a + c.charCodeAt(0),
+    0
+  );
+
+  const views = 400 + (seed % 1600);
+  const clicks = Math.round(views * 0.07);
+  const engagement = Math.round(views * 0.045);
+  const orders = Math.round(clicks * 0.15);
+
+  const entry = {
+    id: Date.now(),
+    productId: mk.product.id,
+    productName: mk.product.category,
+    dataUrl: mk.product.dataUrl,
+    date: new Date().toLocaleDateString(),
+    types: mk.formats.slice(),
+    style: mk.style,
+    festival: mk.festival,
+    shares: 0,
+    views,
+    clicks,
+    engagement,
+    orders
+  };
+
+  const promotions = [
+    entry,
+    ...state.promotions
+  ];
+
+  if (state.user) {
+    await storeSet(
+      'promotions:' + state.user.email,
+      promotions
+    );
+  }
+
+  setState({
+    promotions
+  });
+}
+function generateContent() {
+  const mk = state.marketing;
+
+  const noteEl = document.getElementById('mkt-note');
+  const note = noteEl ? noteEl.value : (mk.note || '');
+
+  if (mk.formats.length === 0) {
+    alert((MKT_UI[mk.language] || MKT_UI.en).pickFormat);
+    return;
+  }
+
+  const generated = generateMarketing(mk.product, {
+    style: mk.style,
+    audience: mk.audience,
+    festival: mk.festival,
+    language: mk.language,
+    variant: mk.variant,
+    note
+  });
+
+  const nextMk = Object.assign({}, mk, {
+    generated,
+    activeCaption: 'story',
+    note
+  });
+
+  setState({
+    marketing: nextMk
+  });
+
+  recordPromotion(nextMk);
+}
 
       /* ============================= Accessibility panel ============================= */
       function renderPanel() {
